@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  eshop_pg:
+    image: postgres:15.4-alpine3.18
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=27102010Postgresql
+      - POSTGRES_DB=eshop_db
+      - TZ=Europe/Chisinau
+    ports:
+      - "5777:5432"
+    volumes:
+      - ./data:/var/lib/postgresql/data
+
