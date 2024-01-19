@@ -16,5 +16,5 @@ class Product(Model):
 
     price_standard = models.OneToOneField("Money", on_delete=models.CASCADE, related_name="price_standard_reverse")
 
-    price_discount = models.OneToOneField("Money", on_delete=models.CASCADE, related_name="price_dicount_reverse")
+    price_discount = models.OneToOneField("Money", on_delete=models.CASCADE, related_name="price_dicount_reverse", null=True)
     
