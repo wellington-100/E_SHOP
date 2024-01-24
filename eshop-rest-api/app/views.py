@@ -11,8 +11,19 @@ from .models.Order import Order
 from .models.OrderItem import OrderItem
 from .serializers import ProductSerializer, OrderSerializer
 from rest_framework.response import Response
+from django.template import loader
+from django.http import HttpResponse
 
-#PUBLIC VIEWS
+
+# PUBLIC VIEWS
+def indexPage(request):
+    template = loader.get_template('public/index.html')
+    return HttpResponse(template.render({}, request))
+
+
+
+
+#PUBLIC API VIEWS
 class ProductView(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer

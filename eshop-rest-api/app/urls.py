@@ -16,12 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from .views import ProductView, ProductAdminView, CreateOrderView
+from .views import ProductView, ProductAdminView, CreateOrderView, indexPage
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
 
     # PUBLIC ROUTES
+    path('', indexPage),
+
     path('products', ProductView.as_view()),
     path('orders/<uuid:uuid>', CreateOrderView.as_view()),
 

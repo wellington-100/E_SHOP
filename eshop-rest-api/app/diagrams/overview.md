@@ -126,10 +126,13 @@ Product
 
 
 -------------------------------------------------------------------------------------------------------------------------------
-
-
-
-
+                                                                        |
+                                                                        |
+                                +---------------------------------- / <-----> indexPage() <--> templates/public/index.html
+                                |                                       |
+                                |                                       |
+                                |                                       |
+                                v                                       |
                     CLIENT (HTML, CSS, JS, ...)                         |                     API (drf, postgresql....)
                                                                         | 
                                                                         |
@@ -165,6 +168,37 @@ Product
 
 
 -------------------------------------------------------------------------------------------------------------------------------
+ 
+ 
+      BROWSER
+         |
+      window  <---- GET / <---- index.html
+         |
+         +--- <---- GET /static/public.css
+         |
+         +--- <---- GET /static/public.js
+         |
+         |
++------> +-- function loadProduct () {
+|         |
+|         xhr = new XMLHttpRequest()
+|         |
+|         xhr.open("GET", "/products")
+|         |
+|         xhr.onload = function () {
+|           response = xhr.responseText --------------------- response JSON [...] / string
+|           data = JSON.parse(response)
+|           console.log(data)***
+|         }
+|         |
+|         xhr.send() ---------------------------------------> GET /products --->...
+|       }
+|
++-------- loadProduct ()
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+
 
 
 Order
