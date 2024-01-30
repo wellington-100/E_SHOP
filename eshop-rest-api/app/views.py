@@ -57,13 +57,6 @@ class CreateOrderView(generics.CreateAPIView):
 
 
 
-
-
-
-
-
-
-
 # ADMIN VIEWS
 class ProductAdminView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
