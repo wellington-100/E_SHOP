@@ -7,9 +7,10 @@
 
 from rest_framework import generics, status
 from .models.Product import Product
+from .models.Money import Money
 from .models.Order import Order
 from .models.OrderItem import OrderItem
-from .serializers import ProductSerializer, OrderSerializer
+from .serializers import ProductSerializer, OrderSerializer, MoneySerializer
 from rest_framework.response import Response
 from django.template import loader
 from django.http import HttpResponse
@@ -54,6 +55,10 @@ class CreateOrderView(generics.CreateAPIView):
 
 
  
+
+class MoneyView(generics.RetrieveAPIView):
+    queryset = Money.objects.all()
+    serializer_class = MoneySerializer
 
 
 
