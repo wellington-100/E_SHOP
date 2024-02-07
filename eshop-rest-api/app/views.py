@@ -59,11 +59,3 @@ class CreateOrderView(generics.CreateAPIView):
 class MoneyView(generics.RetrieveAPIView):
     queryset = Money.objects.all()
     serializer_class = MoneySerializer
-
-
-
-# ADMIN VIEWS
-class ProductAdminView(generics.ListCreateAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    # TODO: acces policy

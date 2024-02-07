@@ -14,36 +14,14 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include
-# from .views import ProductView, ProductAdminView, CreateOrderView, MoneyView, indexPage
+from django.urls import path
+from .views import *
 
 
+
+# administrative routes
 urlpatterns = [
-path('admin/', include('app.admin.urls')),
+    # path('admin/', admin.site.urls)
+    path('products/<uuid:pk>', ProductREADView.as_view()),
+    path('products/', ProductBView.as_view())
 ]
-
-
-
-
-
-
-
-
-
-
-
-
-
-# urlpatterns = [
-#     # path('admin/', admin.site.urls),
-
-#     # PUBLIC ROUTES
-#     path('', indexPage),
-
-#     path('products', ProductView.as_view()),
-#     path('orders/<uuid:uuid>', CreateOrderView.as_view()),
-#     path('money/<uuid:pk>', MoneyView.as_view()),
-
-#     path('admin/products', ProductAdminView.as_view())
-# ]
