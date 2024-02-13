@@ -225,3 +225,57 @@ Order
 HW: get to this point, draw diagrams:
     1. call stack
     2. db relationships: Order, OrderItem, Product
+
+
+
+_______________________________
+
+
+# Models
+
+Payment
+ + id
+ + amount   ------> Money
+ + client   ------> Client
+ + order    ------> Order
+ + completed (ts)
+
+Client
+ + id
+ + name
+ + email
+ + password
+ + phone
+ + created (account) (ts)
+ + last_online (ts)
+
+Order <----------+
+ + id            |
+ + total ------------>  Money
+ + client ----------->  Client
+ + state ------------> "placed", "processed", .... 
+ + created (ts)
+ + updated (ts)
+                 |
+OrderItem        |
+ + id            |
+ + order --------+
+ + product ------+
+ + quantity      |
+ + cost ----------------> Money
+                 |
+Product <--------+
+ + id
+ + name
+ + image
+ + description
+ + available_quantity
+ + created (ts)
+ + updated
+ + price_standard -------+
+ + price_discount -----+ |
+                       | |
+Money <----------------+<+
+ + id
+ + amount
+ + currency
