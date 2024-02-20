@@ -21,10 +21,17 @@ from .views import *
 
 urlpatterns = [
     # administrative API routes
+    path('products/image', ProductImageAView.as_view()),
+
     path('products/<uuid:pk>', ProductREDView.as_view()),
     path('products/', ProductBAView.as_view()),
 
     path('money/<uuid:pk>', MoneyREDView.as_view()),
+
+    # ideally -reagular expression of a list of uuids separated by coma
+    path('money/multi/<str:pks>', MoneyBCustomView.as_view()),
+    path('images/multi/<str:pks>', ImagesBCustomView.as_view()),
+
     path('money/', MoneyBAView.as_view()),
 
     # administrative  TEMPLATES pages / routes

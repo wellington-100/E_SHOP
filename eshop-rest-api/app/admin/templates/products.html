@@ -7,7 +7,7 @@
 
 
 
-{% load static %}%
+{% load static %}
 <!doctype html>
 <html lang="en" data-bs-theme="auto">
     <head>
@@ -279,7 +279,7 @@
         </button>
     </h2>
 
-    <!-- Modal -->
+    <!-- Modal add product -->
     <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -294,6 +294,12 @@
                 <label for="InputProductName" class="form-label">Name of product</label>
                 <input type="text" class="form-control" id="InputProductName" aria-describedby="productNameHelp">
                 <div id="productNameHelp" class="form-text">Don't leave this field empty.</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="InputProductImage" class="form-label">Image</label>
+                <input type="file" class="form-control" id="InputProductImage" aria-describedby="productImageHelp">
+                <div id="producImageHelp" class="form-text">Upload file</div>
             </div>
             <div class="mb-3">
                 <label for="InputProductDescription" class="form-label">Description</label>
@@ -328,17 +334,17 @@
     </div>
 
 
-        <!-- Modal -->
+        <!-- Modal for product delete-->
         <div class="modal fade" id="deleteProductModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel">Are you sure you want to delete the product?</h1>
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Confirm deletion</h1>
                     </div>
-
+                    <div class="modal-body" id="alertDeleteProductMessage"></div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                        <button type="button" class="btn btn-primary" id="confirmDeleteButton" onclick="deleteProduct()">Yes</button>
+                        <button type="button" class="btn btn-danger" id="confirmProductDeleteButton" onclick="deleteProduct(event)">Yes</button>
 
                     </div>
                 </div>
@@ -349,33 +355,64 @@
 
     <script>
         // HW1: add a confirmation modal between the delete button and the deleteProduct() call
+        // HW2: name-product in delete modal window
+        // HW3: edit product // hint 28.00- //shop_p15a
         function loadProducts(){
             updateAPI("GET", "/admin/products/", null, function(products){
+                let ids = ""
+                let iids = ""
+
                 for (let i = 0; i < products.length; i++) {
                     productsTableBody.innerHTML += `
                         <tr>
                             <td>${products[i].id}</td>
                             <td>${products[i].name}</td>
-                            <td><img src="${products[i].image}" width="50" height="50" alt="${products[i].name}"></td>
-                            <td>${products[i].price_standard}</td>
+                            <td id="pi-${products[i].id}"><img src="${products[i].image}" width="100"></td>
+                            <td id="sp-${products[i].price_standard}">${products[i].price_standard}</td>
                             <td>${products[i].price_discount}</td>
                             <td>
-                                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteProductModal" 
-                                onclick="retrieveDeleteProduct('${products[i].id}')" data-id="${products[i].id}">
+                                <button onclick="(function (id, name){
+                                    confirmProductDeleteButton.setAttribute('data-product-id', id);
+                                    alertDeleteProductMessage.textContent = 'Are you sure you want to delete | ' + name + ' | product?';
+                                })('${products[i].id}', '${products[i].name}')"
+                                type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteProductModal">
                                 X
                                 </button>
+
                             </td>
 
                         </tr>
                     `
+                    ids += `${products[i].price_standard}`
+                    if(i < products.length -1){
+                        ids += ','
+                    }
+
+                    iids += `${products[i].id}`
+                    if (i < products.length - 1) {
+                        ids += ','
+                    }
+                }
+                if(ids.length > 0){
+                    updateAPI("GET", `/admin/money/multi/${ids}`, null, function (money) {
+                        for (let i = 0; i < money.length; i++) {
+                            document.getElementById(`sp-${money[i].id}`).innerHTML = `${money[i].amount} ${money[i].currency}`
+                        }
+                    })
+                }
+                if (iids.length > 0) {
+                    updateAPI("GET", `/admin/images/multi/${iids}`, null, function (images) {
+                        for (let i = 0; i < images.length; i++) {
+                            document.getElementById(`pi-${images[i].product}`).innerHTML = `<img src="/static/images${images[i].file}" width="100"/>`
+                        }
+                    })
                 }
             })
         }
         
-        function deleteProduct() {
-            let productId = document.getElementById('confirmDeleteButton').getAttribute('data-id');
-
-            updateAPI("DELETE", `/admin/products/${productId}`, null, function (data) {
+        function deleteProduct(event) {
+            let id = event.target.getAttribute('data-product-id');
+            updateAPI("DELETE", `/admin/products/${id}`, null, function (data) {
                 setTimeout(function () {
                     location.reload();
                 }, 100);
@@ -383,9 +420,6 @@
         }
 
 
-        function retrieveDeleteProduct(id) {
-            document.getElementById('confirmDeleteButton').setAttribute('data-id', id);
-        }
 
         function saveProducts() {
             let product_name = InputProductName.value
@@ -406,17 +440,24 @@
                     'image': '1.jpg',
                     'price_standard': standard_price_id
                 }
+
                 updateAPI("POST", "/admin/products/", payload, function(data, xhr){
                     if (xhr.status == 201) {
-                        addProductModalBody.innerHTML = 'Product saved...'
-                        setTimeout(
-                            function () {
-                                location.reload()
-                            }, 3000
-                        )
+                        
+                        let payload = new FormData()
+                        payload.append('file', InputProductImage.files[0])
+                        payload.append('product', data.id)
+                        
+                        uploadFile("/admin/products/image", payload, function(data, xhr){
+                            addProductModalBody.innerHTML = 'Product saved...'
+                            setTimeout(
+                                function () {
+                                    location.reload()
+                                }, 3000
+                            )
+                        })      
                     }
-                })
-
+                })                
             })  
         }
 
