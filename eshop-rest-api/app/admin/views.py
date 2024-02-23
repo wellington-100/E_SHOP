@@ -26,7 +26,7 @@ from ..serializers import ProductSerializer, MoneySerializer, ImageSerializer
 
 
 # ADMIN VIEWS
-class ProductREDView(RetrieveUpdateDestroyAPIView, CreateAPIView):
+class ProductREDView(RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 

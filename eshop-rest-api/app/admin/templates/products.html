@@ -351,12 +351,85 @@
             </div>
         </div>
 
+        <!--Modal edit product-->
+        <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Edit product</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="editProductModalBody">
+            
+                <form>
+                <div class="mb-3">
+                    <label for="EditProductName" class="form-label">Name of product</label>
+                    <input type="text" class="form-control" id="EditProductName" aria-describedby="productNameHelp">
+                    <div id="productNameHelp" class="form-text">Don't leave this field empty.</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="EditProductImage" class="form-label">Image</label>
+                    <div id="EditProductImagePreview" ></div>
+                    <input type="file" class="form-control" id="EditProductImage" aria-describedby="productImageHelp">
+                    <div id="producImageHelp" class="form-text">Upload file</div>
+                </div>
+                <div class="mb-3">
+                    <label for="EditProductDescription" class="form-label">Description</label>
+                    <textarea 
+                        class="form-control" 
+                        id="EditProductDescription" 
+                        aria-describedby="productDescriptionHelp"
+                        ></textarea>
+                    <div id="productDescriptionHelp" class="form-text">Describe your product in a few sentense.</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="EditProductStandardPriceAmount" class="form-label">Price</label>
+                    <input type="text" class="form-control" id="EditProductStandardPriceAmount" aria-describedby="productPriceHelp">
+                    
+                    <select class="form-control" id="EditProductStandardPriceCurrency">
+                        <option value="EUR">Euro</option>
+                        <option value="USD">US Dollar</option>  
+                    </select>
+                    
+                </div>
+                <div id="productPriceHelp" class="form-text">Don't leave this field empty.</div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button id="editSaveProductButton" type="button" class="btn btn-primary" onclick="updateProducts()">Update product</button>
+            </div>
+            </div>
+        </div>
+        </div>
 
 
     <script>
-        // HW1: add a confirmation modal between the delete button and the deleteProduct() call
-        // HW2: name-product in delete modal window
-        // HW3: edit product // hint 28.00- //shop_p15a
+
+
+        function loadProduct(product_id) {
+            updateAPI("GET", `/admin/products/${product_id}`, null, function (product) {
+                EditProductName.value = product.name
+                EditProductDescription.value = product.description
+                updateAPI("GET", `/admin/money/${product.price_standard}`, null, function (price_standard) {
+                    EditProductStandardPriceAmount.value = price_standard.amount
+                    EditProductStandardPriceCurrency.value = price_standard.currency
+
+                    console.log(price_standard)    
+                })
+                updateAPI("GET", `/admin/images/multi/${product.id}`, null, function (images) {
+                    if(images.length > 0){
+                        EditProductImagePreview.innerHTML = `<img src="/static/images${images[0].file}" width="100"/>`
+                    }
+                    
+                })           
+
+            })
+        }
+
         function loadProducts(){
             updateAPI("GET", "/admin/products/", null, function(products){
                 let ids = ""
@@ -377,6 +450,16 @@
                                 })('${products[i].id}', '${products[i].name}')"
                                 type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteProductModal">
                                 X
+                                </button>
+                                <button
+                                    onclick="(function (id, name){
+                                    editSaveProductButton.setAttribute('data-product-id', id);
+                                    alertDeleteProductMessage.textContent = 'Are you sure you want to delete | ' + name + ' | product?';
+                                    })('${products[i].id}', '${products[i].name}');
+                                    loadProduct('${products[i].id}');
+                                    "
+                                    type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProductModal">
+                                    edit
                                 </button>
 
                             </td>
@@ -437,7 +520,6 @@
                 let payload = {
                     'name': product_name,
                     'description': product_description,
-                    'image': '1.jpg',
                     'price_standard': standard_price_id
                 }
 

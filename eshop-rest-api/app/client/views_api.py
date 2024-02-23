@@ -6,14 +6,20 @@
 
 
 from rest_framework import generics, status
+
 from ..models.Product import Product
 from ..models.Money import Money
 from ..models.Order import Order
 from ..models.OrderItem import OrderItem
 from ..serializers import ProductSerializer, OrderSerializer, MoneySerializer
+
 from rest_framework.response import Response
-from django.template import loader
+
 from django.http import HttpResponse
+from django.template import loader
+
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 
 
@@ -23,6 +29,9 @@ class ProductView(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
+class MoneyView(generics.RetrieveAPIView):
+    queryset = Money.objects.all()
+    serializer_class = MoneySerializer
 
 class CreateOrderView(generics.CreateAPIView):
     queryset = Order.objects.all()
@@ -50,6 +59,8 @@ class CreateOrderView(generics.CreateAPIView):
 
  
 
-class MoneyView(generics.RetrieveAPIView):
-    queryset = Money.objects.all()
-    serializer_class = MoneySerializer
+class OrderRView(generics.RetrieveAPIView):
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer

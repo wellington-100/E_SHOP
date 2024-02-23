@@ -26,6 +26,11 @@ urlpatterns = [
     path('', indexPage),
 
     path('products', ProductView.as_view()),
-    path('orders/<uuid:uuid>', CreateOrderView.as_view()),
     path('money/<uuid:pk>', MoneyView.as_view()),
+    path('orders/<uuid:uuid>', CreateOrderView.as_view()),
+
+    # AUTHENTICATED CLIENT ROUTES
+    path('client/orders/<uuid:pk>', OrderRView.as_view()),
+
+    
 ]
