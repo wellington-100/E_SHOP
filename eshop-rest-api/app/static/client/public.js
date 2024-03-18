@@ -20,7 +20,7 @@ function loadProduct() {
 
                     <div id="productStandardPrice">LOADING PRICE...</div>
 
-                    <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#orderModal">
+                    <button id="showOrderModalButton" type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#orderModal">
                         Order <i class="bi bi-arrow-up-right-circle-fill"></i>
                     </button>
                 </div>
@@ -46,15 +46,50 @@ function loadProduct() {
     xhr.send()
 }
 
+function payOrder(){
+    //AJAX
+    xhr = new XMLHttpRequest()
+    xhr.open("GET", `/client/pay/${localStorage.getItem('order_id')}`)
+    xhr.onload = function(){
+        response = xhr.responseText
+        data = JSON.parse(response)
+        // console.log(data)
+        window.open(data.url)
+    }
+    xhr.send()
+}
+
+function viewOrder(){
+    //AJAX
+    xhr = new XMLHttpRequest()
+    xhr.open("GET", `/client/orders/${localStorage.getItem('order_id')}`)
+    xhr.onload = function(){
+        response = xhr.responseText
+        data = JSON.parse(response)
+        let modalBody = document.getElementById('modalBody')
+        modalBody.innerHTML = `
+            <h2>Order Details</h2>
+            <p>Created at ${data.created}</p>
+            <p>Your client id is ${data.client_id}</p>
+            <button id="payButton" type="button" class="btn btn-primary" onclick="payOrder()">PAY<i class="bi bi-check-circle-fill"></i></button>
+        `
+        console.log(data)
+        //HW*: could add more details
+        //HW*: check response status code = 200
+    }
+    xhr.setRequestHeader('Authorization', `Token ${localStorage.getItem('access')}`)
+    xhr.send()
+}
+
 function orderProduct(){
     let product_id = productContainer.getAttribute('data-product-id')
-    let client_name = InputEmail.value
+    let client_email = InputEmail.value
     let client_phone = InputPhone.value
     let client_delivery_wanted = deliveryCheck.checked
     let client_delivery_address = InputAddress.value
 
     let payload = {
-        'client_name': client_name,
+        'client_email': client_email,
         'client_phone': client_phone,
         'client_delivery_wanted': client_delivery_wanted,
         'client_delivery_address': client_delivery_address
@@ -68,7 +103,23 @@ function orderProduct(){
             modalBody.innerHTML = `
             <h2>Order created successfully</h2>
             `
-            //TODO: add order details + QR code
+            
+            localStorage.setItem('access', data.access)
+            localStorage.setItem('order_id', data.id)
+
+            let button = document.getElementById('orderButton')
+            let buttonShow = document.getElementById('showOrderModalButton') 
+
+            button.innerHTML = 'View Order'
+            buttonShow.innerHTML = 'View Order'
+
+            button.onclick = null
+            button.onclick = viewOrder
+            buttonShow.onclick = null
+            buttonShow.onclick = viewOrder
+
+    
+
         }
     }
     xhr.setRequestHeader('Content-type', 'application/json')
@@ -78,7 +129,4 @@ function orderProduct(){
 }
 
 loadProduct()
-
-
-
 
