@@ -58,5 +58,3 @@ Desktop.ini
 
 # node modules
 node_modules/
-stripe_config.py
-eshop-drf-key.pem
